@@ -14,7 +14,8 @@ type FileReader struct {
 
 // ReadAtAddress ...
 func (reader FileReader) ReadAtAddress(start, length int64) []byte {
-	f, err := os.Open(reader.FilePath)
+	f, err := os.OpenFile(reader.FilePath, os.O_RDONLY, 0644)
+	// f, err := os.Open(reader.FilePath)
 	check(err)
 	defer f.Close()
 
@@ -34,39 +35,37 @@ func (reader FileReader) ReadFile() []WordData {
 	defer f.Close()
 
 	buffer := bufio.NewReader(f)
-	wordByte := make([]byte, MaxWordSize)
-	explanationSizeInByte := make([]byte, MaxExplanationSize)
-	var explanationSize int
 	currentAddress := 0
 	for {
+		wordByte := make([]byte, MaxWordSize)
+		explanationSizeInByte := make([]byte, MaxExplanationSize)
+		var explanationSize int
+
 		position := currentAddress
 
-		_, err := buffer.Read(wordByte)
-		if err == io.EOF {
-			break
+		_, err = readEnoughBytes(buffer, wordByte)
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			panic(err)
 		}
-		check(err)
 		currentAddress += len(wordByte)
 
-		_, err = buffer.Read(explanationSizeInByte)
-		if err == io.EOF {
-			break
-		}
+		_, err = readEnoughBytes(buffer, explanationSizeInByte)
 		check(err)
 		currentAddress += len(explanationSizeInByte)
 
 		explanationSize, err = strconv.Atoi(getCleanStringFromByteArray(explanationSizeInByte))
 
-		_, err = buffer.Discard(explanationSize)
-		currentAddress += explanationSize
+		// log.Printf("wordByte %v %v %v\n", (wordByte), len(wordByte), wordCount)
+		// log.Printf("explanationSizeInByte %v %v %v\n", (explanationSizeInByte), len(explanationSizeInByte), explanationSizeInByteCount)
+		// log.Printf("explanationSize %v\n", explanationSize)
 
-		if err != nil {
-			if err == io.EOF {
-				result = append(result, WordData{Word: string(wordByte), ExplanationSize: explanationSize})
-				break
-			}
-			panic(err)
-		}
+		_, err = buffer.Discard(explanationSize)
+		check(err)
+
+		currentAddress += explanationSize
 		result = append(result, WordData{Word: getCleanStringFromByteArray(wordByte), Address: position, ExplanationSize: explanationSize})
 	}
 	return result

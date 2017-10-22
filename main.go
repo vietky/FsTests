@@ -11,7 +11,12 @@ import (
 )
 
 func generateDict(dictPath string) {
-	var writer = dictionary.FileWriter{FilePath: dictPath}
+	fileWriter, err := os.OpenFile(dictPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0644)
+	defer fileWriter.Close()
+	if err != nil {
+		panic(err)
+	}
+	var writer = dictionary.FileWriter{Writer: fileWriter}
 	f, err := os.Open("./raw_dict.txt")
 	if err != nil {
 		panic(err)
@@ -46,7 +51,7 @@ func readDict(dictPath string) {
 func getExplanation(dictPath, word string) string {
 	data := memoryCache.Get(word)
 	if data == nil {
-		return "__NOT_FOUND__"
+		return "__WORD_NOT_FOUND__"
 	}
 	var reader = dictionary.FileReader{FilePath: dictPath}
 	// fmt.Printf("%v %v\n", data.Address, data.ExplanationSize)
@@ -55,12 +60,15 @@ func getExplanation(dictPath, word string) string {
 }
 
 func main() {
-	dictPath := "./dict.dat"
-	// generateDict(dictPath)
-	readDict(dictPath)
-	fmt.Println(getExplanation(dictPath, "company1"))
-	fmt.Println(getExplanation(dictPath, "company5"))
-	fmt.Println(getExplanation(dictPath, "company3"))
-	fmt.Println(getExplanation(dictPath, "company2"))
-	fmt.Println(getExplanation(dictPath, "company6"))
+	dictPath := "./data"
+	if len(os.Args) > 1 && os.Args[1] == "generate" {
+		generateDict(dictPath)
+	} else {
+		readDict(dictPath)
+		fmt.Println(getExplanation(dictPath, "company1"))
+		fmt.Println(getExplanation(dictPath, "company5"))
+		fmt.Println(getExplanation(dictPath, "company3"))
+		fmt.Println(getExplanation(dictPath, "company2"))
+		fmt.Println(getExplanation(dictPath, "company6"))
+	}
 }

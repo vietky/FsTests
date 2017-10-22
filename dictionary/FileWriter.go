@@ -2,14 +2,13 @@ package dictionary
 
 import (
 	"bufio"
-	"fmt"
-	"os"
+	"io"
 	"strconv"
 )
 
 // FileWriter writer
 type FileWriter struct {
-	FilePath string
+	Writer io.Writer
 }
 
 // WriteWord ...
@@ -22,16 +21,14 @@ func (writer FileWriter) WriteWord(word, explanation string) {
 	explanationSize := len(explanationByte)
 	copy(explanationSizeInByte[:], strconv.Itoa(explanationSize))
 
-	f, err := os.OpenFile(writer.FilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	check(err)
+	// log.Printf("wordByte %v %v %v\n", word, (wordByte), len(wordByte))
+	// log.Printf("explanationSizeInByte %v %v\n", (explanationSizeInByte), len(explanationSizeInByte))
+	// log.Printf("explanationSize %v\n", explanationSize)
 
-	fmt.Printf("wordByte %v\n", wordByte)
-	fmt.Printf("explanationSizeInByte %v\n", explanationSizeInByte)
-	fmt.Printf("explanationSize %v\n", explanationSize)
-
-	w := bufio.NewWriter(f)
+	w := bufio.NewWriter(writer.Writer)
 	w.Write(wordByte[:])
 	w.Write(explanationSizeInByte[:])
 	w.Write(explanationByte)
 	w.Flush()
+
 }

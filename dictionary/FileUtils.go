@@ -1,6 +1,7 @@
 package dictionary
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 )
@@ -18,4 +19,17 @@ func getCleanStringFromByteArray(byteArr []byte) string {
 		return string(byteArr[:indexZero])
 	}
 	return string(byteArr[:])
+}
+
+func readEnoughBytes(buffer *bufio.Reader, byteArr []byte) ([]byte, error) {
+	n, err := buffer.Read(byteArr)
+	if err != nil {
+		return byteArr, err
+	}
+	check(err)
+	if n < len(byteArr) {
+		n, err = buffer.Discard(len(byteArr) - n)
+		check(err)
+	}
+	return byteArr, nil
 }
