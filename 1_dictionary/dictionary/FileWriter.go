@@ -11,8 +11,8 @@ type FileWriter struct {
 	f io.Writer
 }
 
-// Write ...
-func (writer FileWriter) Write(word, explanation string) {
+// WriteWord ...
+func (writer FileWriter) WriteWord(word, explanation string) {
 	var wordByte [MaxWordSize]byte
 	var explanationSizeInByte [MaxExplanationSize]byte
 

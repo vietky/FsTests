@@ -90,6 +90,24 @@ else
   add(word, new_explanation)
 ```
 
+## IMPLEMENTATION
+
+We will separate the tasks into multiple classes/functions:
+- FileReader: is used to read a dictionary files
+  - ReadFile(): reads the file and returns a list of Word Data
+  - ReadAtAddress(start, length): get the contains of file at index `start` with length `length` 
+
+- FileWriter: is used to create/write to a dictionary
+  - WriteWord(word, explanation): writes `word` and `explanation` to the end of the file
+  - WriteAtAddress(start, word, explanation): updates word at position `start`
+
+- MemoryCache: is used to store Word Data and its position in memory for quick access, the inner cache used map<string, WordData>
+  - Get(word)
+  - Add(word, explanation)
+  - Update(word, explanation)
+  - Delete(word)
+
+
 ## CONCLUSION
 
 The algorithm above should lookup the word in O(1) since we're using data structure dictionary as a memory caching to store word and address of the explanation.
