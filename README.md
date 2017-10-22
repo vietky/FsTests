@@ -107,6 +107,10 @@ We will separate the tasks into multiple classes/functions:
   - Update(word, explanation)
   - Delete(word)
 
+## DEMO
+
+- Run `go run main.go generate` to generate file `data` from `raw_dict.txt`
+- Run `go run main.go` to get explanation of some words in `raw_dict.txt`
 
 ## CONCLUSION
 
