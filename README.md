@@ -31,7 +31,29 @@ Another problem arises when we update/delete an item by doing this way. It will 
 
 To fix this, let's create a command (called defragment :) ), to move all using words to the start of the file to fill up those holes.
 
-## PSEUDO CODE:
+## IMPLEMENTATION
+
+We will separate the tasks into multiple classes/functions:
+- FileReader: is used to read a dictionary files
+  - ReadFile(): reads the file and returns a list of Word Data
+  - ReadAtAddress(start, length): get the contains of file at index `start` with length `length` 
+
+- FileWriter: is used to create/write to a dictionary
+  - WriteWord(word, explanation): writes `word` and `explanation` to the end of the file
+  - WriteAtAddress(start, word, explanation): updates word at position `start`
+
+- MemoryCache: is used to store Word Data and its position in memory for quick access, the inner cache used map<string, WordData>
+  - Get(word)
+  - Add(word, explanation)
+  - Update(word, explanation)
+  - Delete(word)
+
+## DEMO
+
+- Run `go run main.go generate` to generate file `data` from `raw_dict.txt`
+- Run `go run main.go` to get explanation of some words in `raw_dict.txt`
+
+## PSEUDO CODE (FOR MISSING PARTS IN DEMO):
 
 - Add a word:
 ```
@@ -89,28 +111,6 @@ else
   delete(word)
   add(word, new_explanation)
 ```
-
-## IMPLEMENTATION
-
-We will separate the tasks into multiple classes/functions:
-- FileReader: is used to read a dictionary files
-  - ReadFile(): reads the file and returns a list of Word Data
-  - ReadAtAddress(start, length): get the contains of file at index `start` with length `length` 
-
-- FileWriter: is used to create/write to a dictionary
-  - WriteWord(word, explanation): writes `word` and `explanation` to the end of the file
-  - WriteAtAddress(start, word, explanation): updates word at position `start`
-
-- MemoryCache: is used to store Word Data and its position in memory for quick access, the inner cache used map<string, WordData>
-  - Get(word)
-  - Add(word, explanation)
-  - Update(word, explanation)
-  - Delete(word)
-
-## DEMO
-
-- Run `go run main.go generate` to generate file `data` from `raw_dict.txt`
-- Run `go run main.go` to get explanation of some words in `raw_dict.txt`
 
 ## CONCLUSION
 
