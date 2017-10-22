@@ -2,7 +2,6 @@ package dictionary
 
 import (
 	"bufio"
-	"bytes"
 	"io"
 	"os"
 	"strconv"
@@ -11,6 +10,20 @@ import (
 // FileReader ...
 type FileReader struct {
 	FilePath string
+}
+
+// ReadAtAddress ...
+func (reader FileReader) ReadAtAddress(start, length int64) []byte {
+	f, err := os.Open(reader.FilePath)
+	check(err)
+	defer f.Close()
+
+	_, err = f.Seek(start+MaxWordSize+MaxExplanationSize, io.SeekStart)
+	check(err)
+	buf := make([]byte, length)
+	_, err = f.Read(buf)
+	check(err)
+	return buf
 }
 
 // ReadFile ...
@@ -26,6 +39,8 @@ func (reader FileReader) ReadFile() []WordData {
 	var explanationSize int
 	currentAddress := 0
 	for {
+		position := currentAddress
+
 		_, err := buffer.Read(wordByte)
 		if err == io.EOF {
 			break
@@ -34,17 +49,17 @@ func (reader FileReader) ReadFile() []WordData {
 		currentAddress += len(wordByte)
 
 		_, err = buffer.Read(explanationSizeInByte)
+		if err == io.EOF {
+			break
+		}
 		check(err)
 		currentAddress += len(explanationSizeInByte)
 
-		indexZero := bytes.IndexByte(explanationSizeInByte, 0)
-		if indexZero >= 0 {
-			explanationSize, err = strconv.Atoi(string(explanationSizeInByte[:indexZero]))
-			check(err)
-		}
-		// fmt.Printf("explanationSizeInByte ne %v %v\n", (explanationSizeInByte), indexZero)
-		// fmt.Printf("explanationSize ne %v\n", (explanationSize))
+		explanationSize, err = strconv.Atoi(getCleanStringFromByteArray(explanationSizeInByte))
+
 		_, err = buffer.Discard(explanationSize)
+		currentAddress += explanationSize
+
 		if err != nil {
 			if err == io.EOF {
 				result = append(result, WordData{Word: string(wordByte), ExplanationSize: explanationSize})
@@ -52,7 +67,7 @@ func (reader FileReader) ReadFile() []WordData {
 			}
 			panic(err)
 		}
-		result = append(result, WordData{Word: string(wordByte), Address: currentAddress, ExplanationSize: explanationSize})
+		result = append(result, WordData{Word: getCleanStringFromByteArray(wordByte), Address: position, ExplanationSize: explanationSize})
 	}
 	return result
 }

@@ -1,7 +1,7 @@
 package dictionary
 
 // MaxWordSize default size for every word
-const MaxWordSize = 1024 // 20
+const MaxWordSize = 20 // 1024 // 20
 
 // MaxExplanationSize default size for every explanation size
 const MaxExplanationSize = 20

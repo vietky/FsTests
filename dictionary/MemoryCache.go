@@ -1,18 +1,24 @@
 package dictionary
 
+import (
+	"strings"
+)
+
 // MemoryCache ...
 type MemoryCache struct {
 	dict map[string]WordData
 }
 
-// Init ...
-func (cache MemoryCache) Init() {
+// NewMemoryCache ...
+func NewMemoryCache() MemoryCache {
+	cache := MemoryCache{}
 	cache.dict = make(map[string]WordData)
+	return cache
 }
 
 // Get ...
 func (cache MemoryCache) Get(word string) *WordData {
-	if val, ok := cache.dict[word]; ok {
+	if val, ok := cache.dict[strings.Trim(word, " ")]; ok {
 		return &val
 	}
 	return nil
@@ -20,7 +26,7 @@ func (cache MemoryCache) Get(word string) *WordData {
 
 // Add ...
 func (cache MemoryCache) Add(data WordData) WordData {
-	cache.dict[data.Word] = data
+	cache.dict[strings.Trim(data.Word, " ")] = data
 	return data
 }
 

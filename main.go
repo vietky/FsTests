@@ -22,8 +22,6 @@ func generateDict(dictPath string) {
 		line, err := buf.ReadString('\n')
 		if err != nil {
 			if err == io.EOF {
-				arr := strings.Split(line, ",")
-				writer.WriteWord(arr[0], arr[1])
 				break
 			} else {
 				panic(err)
@@ -34,16 +32,35 @@ func generateDict(dictPath string) {
 	}
 }
 
-var memoryCache = dictionary.MemoryCache{}
+var memoryCache = dictionary.NewMemoryCache()
 
 func readDict(dictPath string) {
 	var reader = dictionary.FileReader{FilePath: dictPath}
 	list := reader.ReadFile()
-	fmt.Printf("%v\n", list)
+	for _, word := range list {
+		memoryCache.Add(word)
+	}
+	// fmt.Printf("%v\n", list)
+}
+
+func getExplanation(dictPath, word string) string {
+	data := memoryCache.Get(word)
+	if data == nil {
+		return "__NOT_FOUND__"
+	}
+	var reader = dictionary.FileReader{FilePath: dictPath}
+	// fmt.Printf("%v %v\n", data.Address, data.ExplanationSize)
+	var explanation = reader.ReadAtAddress(int64(data.Address), int64(data.ExplanationSize))
+	return string(explanation)
 }
 
 func main() {
 	dictPath := "./dict.dat"
 	// generateDict(dictPath)
 	readDict(dictPath)
+	fmt.Println(getExplanation(dictPath, "company1"))
+	fmt.Println(getExplanation(dictPath, "company5"))
+	fmt.Println(getExplanation(dictPath, "company3"))
+	fmt.Println(getExplanation(dictPath, "company2"))
+	fmt.Println(getExplanation(dictPath, "company6"))
 }
